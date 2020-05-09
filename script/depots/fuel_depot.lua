@@ -74,6 +74,10 @@ function fuel_depot:remove_from_network()
   self.network_id = nil
 end
 
+function fuel_depot:get_fuel_temperature()
+  return self.entity.fluidbox[1].temperature
+end
+
 function fuel_depot:get_fuel_amount()
   return self.entity.get_fluid_count(get_fuel_fluid())
 end
@@ -116,6 +120,7 @@ end
 function fuel_depot:handle_fuel_request(depot)
   if not self:can_spawn_drone() then return end
   local amount = self:get_fuel_amount()
+  local temperature = self:get_fuel_temperature()
   if amount < self:minimum_request_size() then return end
 
   amount = math.min((amount - fuel_amount_per_drone), self:get_drone_fluid_capacity())
@@ -125,7 +130,7 @@ function fuel_depot:handle_fuel_request(depot)
   self:remove_fuel(amount)
   self:remove_fuel(fuel_amount_per_drone)
 
-  drone:deliver_fuel(depot, amount)
+  drone:deliver_fuel(depot, amount, temperature)
 
   self.drones[drone.index] = drone
   

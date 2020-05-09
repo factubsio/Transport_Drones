@@ -98,6 +98,7 @@ transport_drone.new = function(request_depot)
   local drone =
   {
     entity = entity,
+    fuel_temperature = request_depot.entity.fluidbox[1].temperature,
     request_depot = request_depot,
     index = tostring(entity.unit_number),
     state = 0,
@@ -117,6 +118,7 @@ function transport_drone:update_speed()
   if self.riding_player then
     speed = speed * 1.5
   end
+  speed = speed * (self.fuel_temperature / 1000)
   self.entity.speed = speed
 end
 
@@ -137,10 +139,12 @@ function transport_drone:pickup_from_supply(supply, count)
 
 end
 
-function transport_drone:deliver_fuel(depot, amount)
+function transport_drone:deliver_fuel(depot, amount, temperature)
+
 
   self.target_depot = depot
   self.fuel_amount = amount
+  self.fuel_temperature = temperature
   self.state = states.delivering_fuel
   self.target_depot.fuel_on_the_way = (self.target_depot.fuel_on_the_way or 0) + amount
 
@@ -265,7 +269,7 @@ end
 
 function transport_drone:process_deliver_fuel()
 
-  self.target_depot.entity.insert_fluid({name = get_fuel_fluid(), amount = self.fuel_amount})
+  self.target_depot.entity.insert_fluid({name = get_fuel_fluid(), amount = self.fuel_amount, temperature = self.fuel_temperature})
 
   self:add_slow_sticker()
   self:update_speed()
@@ -445,7 +449,7 @@ function transport_drone:refund_fuel()
   --self:say(fuel_refund)
 
   if fuel_refund > 0 then
-  self.request_depot.entity.insert_fluid({name = get_fuel_fluid(), amount = fuel_refund})
+  self.request_depot.entity.insert_fluid({name = get_fuel_fluid(), amount = fuel_refund, temperature = self.fuel_temperature})
   elseif fuel_refund < 0 then
     self.request_depot.entity.remove_fluid({name = get_fuel_fluid(), amount = -fuel_refund})
   end

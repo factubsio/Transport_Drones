@@ -1,7 +1,11 @@
 local shared = require("shared")
+
 local name = shared.transport_system_technology
 
+
+
 local transport_system =
+
 {
   name = name,
   localised_name = {name},
@@ -37,21 +41,27 @@ local transport_system =
     },
     {
       type = "unlock-recipe",
+      recipe = "transport-drone-refinery"
+    },
+    {
+      type = "unlock-recipe",
+      recipe = "drone-fuel-from-coal"
+    },
+    {
+      type = "unlock-recipe",
       recipe = "road"
     }
   },
-  prerequisites = {"engine", "oil-processing"},
+  prerequisites = nil,
   unit =
   {
-    count = 200,
+    count = 25,
     ingredients =
     {
       {"automation-science-pack", 1},
-      {"logistic-science-pack", 1},
     },
-    time = 30
+    time = 10
   },
   order = name,
 }
-
 data:extend{transport_system}
